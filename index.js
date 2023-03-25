@@ -5,27 +5,27 @@ const mongoose = require('mongoose');
 const logger = require('./utils/logger');
 const config = require('./utils/config');
 const blogsRouter = require('./controllers/blogs');
+const middleware = require('./utils/middleware');
 
-mongoose.connect(config.MONGODB_URI);
+logger.info('connecting to', config.MONGODB_URI);
+
+mongoose
+  .connect(config.MONGODB_URI)
+  .then(() => {
+    logger.info('Connected to MongoDB');
+  })
+  .catch((error) => {
+    logger.error('error connecting to MongoDB', error.message);
+  });
 
 app.use(cors());
 app.use(express.json());
 
 app.use('/api/blogs', blogsRouter);
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' });
-};
+app.use(middleware.unknownEndpoint);
 
-app.use(unknownEndpoint);
-
-const errorHandler = (error, request, response, next) => {
-  logger.error(error.message);
-
-  next(error);
-};
-
-app.use(errorHandler);
+app.use(middleware.errorHandler);
 
 app.listen(config.PORT, () => {
   logger.info(`Server running on port ${config.PORT}`);
