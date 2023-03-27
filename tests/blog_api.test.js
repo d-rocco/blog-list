@@ -7,12 +7,7 @@ const helper = require('./test_helper.js');
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-
-  const blogObjects = helper.initialBlogs.map(
-    (blog) => new Blog(blog)
-  );
-  const promiseArray = blogObjects.map((blog) => blog.save());
-  await Promise.all(promiseArray);
+  await Blog.insertMany(helper.initialBlogs);
 });
 
 test('get proper amount of blogs returned', async () => {
@@ -46,6 +41,22 @@ test('new blog successfully added', async () => {
     helper.initialBlogs.length + 1
   );
   expect(titles).toContain('hi');
+});
+
+test('blog deleted', async () => {
+  const blogsAtStart = await helper.blogsInDB();
+  const blogToDelete = blogsAtStart[0];
+  console.log(blogToDelete);
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const blogsAtEnd = await helper.blogsInDB();
+
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
+
+  const titles = blogsAtEnd.map((r) => r.title);
+
+  expect(titles).not.toContain(blogsAtEnd.title);
 });
 
 afterAll(async () => {
