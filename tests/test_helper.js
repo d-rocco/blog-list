@@ -56,7 +56,17 @@ const blogsInDB = async () => {
   return blogs.map((blog) => blog.toJSON());
 };
 
+const areBlogIDsDefined = (blogIDs) => {
+  for (let i = 0; i < blogIDs.length; i++) {
+    if (blogIDs[i] === undefined) {
+      return undefined;
+    }
+  }
+  return true;
+};
+
 module.exports = {
   initialBlogs,
   blogsInDB,
+  areBlogIDsDefined,
 };
