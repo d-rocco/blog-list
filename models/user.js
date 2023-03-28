@@ -4,6 +4,12 @@ const userSchema = new mongoose.Schema({
   name: String,
   username: String,
   password: String,
+  blogs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Blog',
+    },
+  ],
 });
 
 userSchema.set('toJSON', {
@@ -11,6 +17,7 @@ userSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
     delete returnedObject.__v;
+    delete returnedObject.password;
   },
 });
 
